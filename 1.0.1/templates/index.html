@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>股票交易系统</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 顶部状态栏 -->
+        <header class="header">
+            <div class="title">
+                <i class="fas fa-chart-line"></i>
+                股票交易模拟系统
+            </div>
+            <div class="account-info">
+                <div class="account-item">
+                    <span>总资产:</span>
+                    <span id="total-assets">¥100,000.00</span>
+                </div>
+                <div class="account-item">
+                    <span>总市值:</span>
+                    <span id="stock-value">¥0.00</span>
+                </div>
+                <div class="account-item">
+                    <span>总盈亏:</span>
+                    <span id="total-profit">¥0.00</span>
+                </div>
+                <div class="account-item">
+                    <span>当日盈亏:</span>
+                    <span id="today-profit">¥0.00</span>
+                </div>
+            </div>
+            <div class="status-bar">
+                <div class="clock" id="clock"><i class="fas fa-clock"></i> <b>2023-01-01 00:00:00</b></div>
+                <div class="trading-phase" id="trading-phase"><i class="fas fa-exchange-alt"></i> <b>交易阶段: 闭市</b></div>
+            </div>
+        </header>
+
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <!-- 左侧边栏 - 股票查询和交易 -->
+            <div class="sidebar">
+                <div class="card stock-search">
+                    <h3><i class="fas fa-search"></i> 股票查询</h3>
+                    <div class="form-group">
+                        <label for="stock-code"><i class="fas fa-tag"></i> 股票代码:</label>
+                        <input type="text" id="stock-code" value="sh600519" placeholder="输入股票代码">
+                        <button id="search-stock"><i class="fas fa-search"></i> 查询</button>
+                    </div>
+                    <div class="sample-stocks">
+                        <button data-code="sh600519"><i class="fas fa-wine-bottle"></i> 贵州茅台</button>
+                        <button data-code="sz000001"><i class="fas fa-building"></i> 平安银行</button>
+                        <button data-code="sz002415"><i class="fas fa-camera"></i> 海康威视</button>
+                        <button data-code="sh600036"><i class="fas fa-university"></i> 招商银行</button>
+                        <button data-code="sz300750"><i class="fas fa-battery-full"></i> 宁德时代</button>
+                        <button data-code="sh601318"><i class="fas fa-shield-alt"></i> 中国平安</button>
+                    </div>
+                </div>
+
+                <div class="card trade-action">
+                    <h3><i class="fas fa-trade-federation"></i> 交易操作</h3>
+                    <div class="form-group">
+                        <label for="trade-price"><i class="fas fa-money-bill-wave"></i> 价格:</label>
+                        <input type="number" id="trade-price" step="0.01" min="0.01" placeholder="委托价格">
+                    </div>
+                    <div class="form-group">
+                        <label for="trade-quantity"><i class="fas fa-boxes"></i> 数量(手):</label>
+                        <input type="number" id="trade-quantity" min="1" value="1" placeholder="交易数量">
+                    </div>
+                    <div class="action-buttons">
+                        <button id="buy-btn" class="btn-buy"><i class="fas fa-arrow-circle-up"></i> 买入</button>
+                        <button id="sell-btn" class="btn-sell"><i class="fas fa-arrow-circle-down"></i> 卖出</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 中间区域 - 股票信息 -->
+            <div class="content">
+                <div class="card stock-info">
+                    <h3 id="stock-name"><i class="fas fa-chart-bar"></i> 贵州茅台 (SH600519)</h3>
+                    <div class="stock-price">
+                        <span id="current-price">0.00</span>
+                        <span id="price-change">+0.00 (0.00%)</span>
+                    </div>
+                    <div class="stock-details">
+                        <div class="detail-row">
+                            <div class="detail-item">
+                                <span>今开</span>
+                                <span id="open-price">0.00</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>最高</span>
+                                <span id="high-price">0.00</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>成交量</span>
+                                <span id="volume">0</span>
+                            </div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-item">
+                                <span>昨收</span>
+                                <span id="prev-close">0.00</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>最低</span>
+                                <span id="low-price">0.00</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>成交额</span>
+                                <span id="amount">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bid-ask">
+                        <div class="bid">
+                            <h4><i class="fas fa-arrow-down"></i> 买盘</h4>
+                            <div class="bid-item"><span>买1</span><span id="bid1-price">0.00</span><span id="bid1-vol">0</span></div>
+                            <div class="bid-item"><span>买2</span><span id="bid2-price">0.00</span><span id="bid2-vol">0</span></div>
+                            <div class="bid-item"><span>买3</span><span id="bid3-price">0.00</span><span id="bid3-vol">0</span></div>
+                            <div class="bid-item"><span>买4</span><span id="bid4-price">0.00</span><span id="bid4-vol">0</span></div>
+                            <div class="bid-item"><span>买5</span><span id="bid5-price">0.00</span><span id="bid5-vol">0</span></div>
+                        </div>
+                        <div class="ask">
+                            <h4><i class="fas fa-arrow-up"></i> 卖盘</h4>
+                            <div class="ask-item"><span>卖1</span><span id="ask1-price">0.00</span><span id="ask1-vol">0</span></div>
+                            <div class="ask-item"><span>卖2</span><span id="ask2-price">0.00</span><span id="ask2-vol">0</span></div>
+                            <div class="ask-item"><span>卖3</span><span id="ask3-price">0.00</span><span id="ask3-vol">0</span></div>
+                            <div class="ask-item"><span>卖4</span><span id="ask4-price">0.00</span><span id="ask4-vol">0</span></div>
+                            <div class="ask-item"><span>卖5</span><span id="ask5-price">0.00</span><span id="ask5-vol">0</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tabs">
+                    <button class="tab active" data-tab="portfolio"><i class="fas fa-wallet"></i> 持仓</button>
+                    <button class="tab" data-tab="orders"><i class="fas fa-list"></i> 订单</button>
+                    <button class="tab" data-tab="history"><i class="fas fa-history"></i> 历史</button>
+                </div>
+
+                <div class="tab-content">
+                    <!-- 持仓面板 -->
+                    <div id="portfolio-panel" class="panel active">
+                        <div class="chart-container">
+                            <canvas id="equity-chart"></canvas>
+                        </div>
+                        
+                        <div class="table-controls">
+                            <div class="search-box">
+                                <input type="text" id="position-search" placeholder="搜索持仓...">
+                                <button id="search-positions"><i class="fas fa-search"></i></button>
+                            </div>
+                            <div class="pagination">
+                                <button id="position-prev"><i class="fas fa-chevron-left"></i></button>
+                                <span id="position-page-info">第1页/共1页</span>
+                                <button id="position-next"><i class="fas fa-chevron-right"></i></button>
+                            </div>
+                        </div>
+                        
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>股票代码</th>
+                                        <th>持仓数量</th>
+                                        <th>成本价</th>
+                                        <th>当前价</th>
+                                        <th>持仓市值</th>
+                                        <th>浮动盈亏</th>
+                                        <th>买入日期</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="portfolio-body">
+                                    <!-- 动态填充 -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- 订单面板 -->
+                    <div id="orders-panel" class="panel">
+                        <div class="table-controls">
+                            <div class="search-box">
+                                <input type="text" id="order-search" placeholder="搜索订单...">
+                                <button id="search-orders"><i class="fas fa-search"></i></button>
+                            </div>
+                            <div class="pagination">
+                                <button id="prev-page"><i class="fas fa-chevron-left"></i></button>
+                                <span id="page-info">第1页/共1页</span>
+                                <button id="next-page"><i class="fas fa-chevron-right"></i></button>
+                            </div>
+                        </div>
+                        
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>订单号</th>
+                                        <th>类型</th>
+                                        <th>股票代码</th>
+                                        <th>价格</th>
+                                        <th>数量</th>
+                                        <th>状态</th>
+                                        <th>创建时间</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="orders-body">
+                                    <!-- 动态填充 -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- 历史面板 -->
+                    <div id="history-panel" class="panel">
+                        <div class="table-controls">
+                            <div class="search-box">
+                                <input type="text" id="history-search" placeholder="搜索历史交易...">
+                                <button id="search-history"><i class="fas fa-search"></i></button>
+                            </div>
+                            <div class="pagination">
+                                <button id="history-prev"><i class="fas fa-chevron-left"></i></button>
+                                <span id="history-page-info">第1页/共1页</span>
+                                <button id="history-next"><i class="fas fa-chevron-right"></i></button>
+                            </div>
+                        </div>
+                        
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>时间</th>
+                                        <th>类型</th>
+                                        <th>股票代码</th>
+                                        <th>价格</th>
+                                        <th>数量</th>
+                                        <th>金额</th>
+                                        <th>盈亏</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="history-body">
+                                    <!-- 动态填充 -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部状态栏 -->
+        <footer class="footer">
+            <div id="status-message"><i class="fas fa-info-circle"></i> 系统就绪</div>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
