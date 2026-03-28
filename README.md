@@ -2,88 +2,90 @@
 
 <div align="center">
 
-**A 股模拟交易系统**
+**China A-Share Simulated Trading System**
 
 [![Python](https://img.shields.io/badge/Python-3.7+-blue.svg)](https://python.org)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Flask](https://img.shields.io/badge/Flask-Backend-lightgrey.svg)](https://flask.palletsprojects.com/)
 
+[**中文文档**](README_CN.md)
+
 </div>
 
-## 简介
+## Introduction
 
-一个完整的 A 股模拟交易平台，包含后端交易引擎、实时数据爬虫和前端交易界面。模拟真实交易环境，支持 T+1 规则、涨跌停限制、交易费用计算等。
+A complete China A-share simulated trading platform featuring a backend trading engine, real-time data crawler, and frontend trading interface. Simulates a realistic trading environment with T+1 rules, price limit restrictions, and trading fee calculations.
 
-![系统截图](image/img1.png)
+![Screenshot](image/img1.png)
 
-## 特性
+## Features
 
-- **真实交易规则**：T+1、集合竞价、涨跌停、佣金/印花税/过户费
-- **实时数据**：从东方财富获取实时股票行情
-- **交易时段管理**：自动识别盘前/盘中/盘后/休市状态
-- **持仓管理**：支持多次买入、分批卖出、成本价计算
-- **挂单撮合**：限价单自动撮合，支持撤单
-- **数据持久化**：自动保存交易状态，重启不丢失
-- **桌面控制面板**：tkinter 控制窗口，一键启动
+- **Realistic Trading Rules**: T+1, call auction, price limits, commission / stamp duty / transfer fees
+- **Real-Time Data**: Live stock quotes from East Money (东方财富)
+- **Trading Session Management**: Auto-detects pre-market / in-session / post-market / closed states
+- **Position Management**: Multiple buys, partial sells, cost price calculation
+- **Order Matching**: Limit orders with automatic matching, supports order cancellation
+- **Data Persistence**: Auto-saves trading state, survives restarts
+- **Desktop Control Panel**: tkinter control window, one-click launch
 
-## 快速开始
+## Quick Start
 
-### 1. 安装依赖
+### 1. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. 启动
+### 2. Launch
 
 ```bash
 python app.pyw
 ```
 
-系统会弹出控制面板窗口，点击"打开浏览器"即可访问 `http://127.0.0.1:5000` 交易界面。
+A control panel window will appear. Click "Open Browser" to access the trading interface at `http://127.0.0.1:5000`.
 
-## 项目结构
+## Project Structure
 
 ```
 Stock-demo-trading-server/
-├── app.pyw             # Flask 应用入口 + tkinter 控制面板
-├── trading_api.py      # 交易引擎核心（下单/撮合/持仓/T+1）
-├── crawler.py          # 东方财富实时行情爬虫
-├── common.py           # 交易时段规则、费用计算、节假日判断
-├── requirements.txt    # Python 依赖
+├── app.pyw             # Flask app entry + tkinter control panel
+├── trading_api.py      # Trading engine core (orders/matching/positions/T+1)
+├── crawler.py          # East Money real-time quote crawler
+├── common.py           # Trading session rules, fee calculation, holiday detection
+├── requirements.txt    # Python dependencies
 ├── static/
-│   ├── css/style.css   # 前端样式
-│   └── js/app.js       # 前端逻辑
+│   ├── css/style.css   # Frontend styles
+│   └── js/app.js       # Frontend logic
 ├── templates/
-│   └── index.html      # 交易界面
-├── data/               # 运行时数据（自动生成）
-└── image/              # 截图
+│   └── index.html      # Trading interface
+├── data/               # Runtime data (auto-generated)
+└── image/              # Screenshots
 ```
 
-## API 接口
+## API Endpoints
 
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | `/api/portfolio` | 获取投资组合（资金/持仓/收益） |
-| GET | `/api/stock/<code>` | 获取股票实时行情 |
-| POST | `/api/buy` | 买入股票 |
-| POST | `/api/sell` | 卖出股票 |
-| POST | `/api/cancel_order` | 撤单 |
-| GET | `/api/orders` | 获取所有订单 |
-| GET | `/api/history` | 获取交易历史 |
-| GET | `/api/trading_phase` | 获取当前交易阶段 |
-| GET | `/api/equity_history` | 获取资金曲线 |
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/portfolio` | Get portfolio (funds / positions / P&L) |
+| GET | `/api/stock/<code>` | Get real-time stock quote |
+| POST | `/api/buy` | Buy stock |
+| POST | `/api/sell` | Sell stock |
+| POST | `/api/cancel_order` | Cancel order |
+| GET | `/api/orders` | Get all orders |
+| GET | `/api/history` | Get trade history |
+| GET | `/api/trading_phase` | Get current trading phase |
+| GET | `/api/equity_history` | Get equity curve |
 
-## 交易规则
+## Trading Rules
 
-| 规则 | 说明 |
-|------|------|
-| T+1 | 当日买入，下一交易日可卖出 |
-| 交易时间 | 9:30-11:30 / 13:00-15:00 |
-| 集合竞价 | 9:15-9:25 |
-| 买入佣金 | 万 2.5（最低 5 元）+ 过户费万 0.1 |
-| 卖出佣金 | 万 2.5 + 印花税千 1 + 过户费万 0.1 |
+| Rule | Description |
+|------|-------------|
+| T+1 | Shares bought today can be sold on the next trading day |
+| Trading Hours | 9:30–11:30 / 13:00–15:00 (CST) |
+| Call Auction | 9:15–9:25 |
+| Buy Commission | 0.025% (min ¥5) + transfer fee 0.001% |
+| Sell Commission | 0.025% + stamp duty 0.1% + transfer fee 0.001% |
 
-## 许可证
+## License
 
 MIT License
